@@ -5,13 +5,14 @@
   branch = "master"
   name = "github.com/dukfaar/goUtils"
   packages = [
+    "env",
     "eventbus",
     "graphql",
     "http",
     "relay",
     "service"
   ]
-  revision = "087b7b3a9c2e992b4b0b3fb95e4c1bbfd9b2a408"
+  revision = "930a788818b67d59774c551d1c31babafe16377c"
 
 [[projects]]
   branch = "master"
@@ -83,6 +84,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "be3d8e843ca67b4915e9f70f8a11479409f15cca63915350e568f3290977d8b9"
+  inputs-digest = "ce8e0aeb1039fe159b6ca126fc55b7ffdd13940b7f279f5e8ac10ea28485cd9d"
   solver-name = "gps-cdcl"
   solver-version = 1
