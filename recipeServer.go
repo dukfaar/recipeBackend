@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/dukfaar/goUtils/env"
 	"github.com/dukfaar/goUtils/eventbus"
 	dukGraphql "github.com/dukfaar/goUtils/graphql"
 	dukHttp "github.com/dukfaar/goUtils/http"
@@ -19,7 +20,7 @@ import (
 )
 
 func main() {
-	dbSession, err := mgo.Dial("localhost")
+	dbSession, err := mgo.Dial(env.GetDefaultEnvVar("DB_HOST", "localhost"))
 	if err != nil {
 		panic(err)
 	}
@@ -29,7 +30,7 @@ func main() {
 
 	db := dbSession.DB("recipe")
 
-	eventbus := eventbus.NewNsqEventBus("localhost:4150", "localhost:4161")
+	eventbus := eventbus.NewNsqEventBus(env.GetDefaultEnvVar("NSQD_TCP_URL", "localhost:4150"), env.GetDefaultEnvVar("NSQLOOKUP_HTTP_URL", "localhost:4161"))
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "db", db)
@@ -52,5 +53,5 @@ func main() {
 		},
 	}))
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":"+env.GetDefaultEnvVar("PORT", "8080"), nil))
 }
