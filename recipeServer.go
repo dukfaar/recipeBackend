@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -62,6 +63,17 @@ func main() {
 	}
 
 	nsqEventbus.Emit("service.up", serviceInfo)
+
+	nsqEventbus.On("service.up", "recipe", func(msg []byte) error {
+		newService := eventbus.ServiceInfo{}
+		json.Unmarshal(msg, &newService)
+
+		if newService.Name == "apigateway" {
+			nsqEventbus.Emit("service.up", serviceInfo)
+		}
+
+		return nil
+	})
 
 	log.Fatal(http.ListenAndServe(":"+env.GetDefaultEnvVar("PORT", "8080"), nil))
 }
