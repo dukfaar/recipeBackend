@@ -39,13 +39,9 @@ func main() {
 
 	schema := graphql.MustParseSchema(Schema, &Resolver{})
 
-	http.Handle("/graphql", dukHttp.AddContext(ctx, &graphqlRelay.Handler{
+	http.Handle("/graphql", dukHttp.AddContext(ctx, dukHttp.Authenticate(&graphqlRelay.Handler{
 		Schema: schema,
-	}))
-
-	http.HandleFunc("/schema", func(res http.ResponseWriter, req *http.Request) {
-		res.Write([]byte(Schema))
-	})
+	})))
 
 	http.Handle("/socket", dukHttp.AddContext(ctx, &dukGraphql.SocketHandler{
 		Schema: schema,
@@ -63,7 +59,6 @@ func main() {
 		Hostname:              env.GetDefaultEnvVar("PUBLISHED_HOSTNAME", "servicebackend"),
 		Port:                  env.GetDefaultEnvVar("PUBLISHED_PORT", "8080"),
 		GraphQLHttpEndpoint:   "/graphql",
-		GraphQLSchemaEndpoint: "/schema",
 		GraphQLSocketEndpoint: "/socket",
 	}
 
