@@ -2,8 +2,8 @@ package recipe
 
 import (
 	"github.com/dukfaar/goUtils/relay"
+	"github.com/globalsign/mgo/bson"
 	graphql "github.com/graph-gophers/graphql-go"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type InOutElement struct {

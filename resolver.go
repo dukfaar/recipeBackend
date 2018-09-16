@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 
 	"github.com/dukfaar/goUtils/relay"
 	"github.com/dukfaar/recipeBackend/recipe"
