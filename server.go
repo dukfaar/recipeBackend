@@ -62,6 +62,34 @@ func main() {
 		Port:                  env.GetDefaultEnvVar("PUBLISHED_PORT", "8080"),
 		GraphQLHttpEndpoint:   "/graphql",
 		GraphQLSocketEndpoint: "/socket",
+		SchemaExtensions: []eventbus.SchemaExtension{{
+			Type: "RecipeInput",
+			Fields: []eventbus.FieldType{
+				{
+					Name: "item",
+					Type: "Item",
+					Resolve: eventbus.ResolveType{
+						By: "item",
+						FieldArguments: map[string]string{
+							"id": "itemId",
+						},
+					},
+				},
+			}}, {
+			Type: "RecipeOutput",
+			Fields: []eventbus.FieldType{
+				{
+					Name: "item",
+					Type: "Item",
+					Resolve: eventbus.ResolveType{
+						By: "item",
+						FieldArguments: map[string]string{
+							"id": "itemId",
+						},
+					},
+				},
+			},
+		}},
 	}
 
 	nsqEventbus.Emit("service.up", serviceInfo)

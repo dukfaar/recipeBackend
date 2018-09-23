@@ -18,7 +18,7 @@
     "relay",
     "service"
   ]
-  revision = "0e934adea3c017f52d39526e5e7c43158278846d"
+  revision = "8298546bdbc483106fed9246056198935f003964"
 
 [[projects]]
   branch = "master"
@@ -127,13 +127,13 @@
     "nfs",
     "xfs"
   ]
-  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
+  revision = "418d78d0b9a7b7de3a6bbc8a23def624cc977bb2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
+  revision = "2f5d2388922f370f4355f327fcf4cfe9f5583908"
 
 [solve-meta]
   analyzer-name = "dep"
