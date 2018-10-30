@@ -2,9 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
 
 	"github.com/globalsign/mgo/bson"
 
+	"github.com/dukfaar/goUtils/eventbus"
+	dukgraphql "github.com/dukfaar/goUtils/graphql"
+	"github.com/dukfaar/goUtils/permission"
 	"github.com/dukfaar/goUtils/relay"
 	"github.com/dukfaar/recipeBackend/recipe"
 	graphql "github.com/graph-gophers/graphql-go"
@@ -148,4 +154,145 @@ func (r *Resolver) Recipe(ctx context.Context, args struct {
 	}
 
 	return nil, err
+}
+
+func fetchFFXIVNamespace(ctx context.Context) (string, error) {
+	fetcher := ctx.Value("apigatewayfetcher").(dukgraphql.Fetcher)
+
+	namespaceResult, err := fetcher.Fetch(dukgraphql.Request{
+		Query: "query { namespaceByName(name: \"FFXIV\") { _id name } }",
+	})
+
+	if err != nil {
+		fmt.Printf("Error fetching namespace: %v\n", err)
+		return "", err
+	}
+
+	namespaceResponse := dukgraphql.Response{namespaceResult}
+
+	return namespaceResponse.GetObject("namespaceByName").GetString("_id"), nil
+}
+
+func fetchFFXIVItemByName(ctx context.Context, name string, namespaceId string) (string, error) {
+	fetcher := ctx.Value("apigatewayfetcher").(dukgraphql.Fetcher)
+
+	itemResult, err := fetcher.Fetch(dukgraphql.Request{
+		Query: "query { findItem(name: \"" + name + "\", namespaceId: \"" + namespaceId + "\") { _id } }",
+	})
+
+	if err != nil {
+		fmt.Printf("Error fetching item: %v\n", err)
+		return "", err
+	}
+
+	itemResponse := dukgraphql.Response{itemResult}
+
+	return itemResponse.GetObject("findItem").GetString("_id"), nil
+}
+
+var rcItemMap = make(map[string]string)
+
+func ConvertRcItemIDToItemServiceID(ctx context.Context, id string, namespaceId string) (string, error) {
+	if _, ok := rcItemMap[id]; ok {
+		return rcItemMap[id], nil
+	}
+
+	rcItemResponse, err := http.Get("https://rc.dukfaar.com/api/item/" + id)
+	if err != nil {
+		fmt.Printf("Error getting item: %v\n", err)
+		return "", err
+	}
+	defer rcItemResponse.Body.Close()
+
+	var itemData struct {
+		Id   string `json:"_id"`
+		Name string `json:"name"`
+	}
+	err = json.NewDecoder(rcItemResponse.Body).Decode(&itemData)
+
+	if err != nil {
+		fmt.Printf("Error parsing item data: %v\n", err)
+		return "", err
+	}
+
+	newId, err := fetchFFXIVItemByName(ctx, itemData.Name, namespaceId)
+
+	if err != nil {
+		fmt.Printf("Error fetching service item: %v\n", err)
+		return "", err
+	}
+
+	rcItemMap[id] = newId
+
+	return newId, nil
+}
+
+func ConvertRecipe(ctx context.Context, recipe map[string]interface{}, namespaceId string) error {
+	delete(recipe, "_id")
+	recipe["namespace"] = namespaceId
+
+	inputs := recipe["inputs"].([]interface{})
+	for inputIndex := range inputs {
+		input := inputs[inputIndex].(map[string]interface{})
+		delete(input, "_id")
+		newId, err := ConvertRcItemIDToItemServiceID(ctx, input["item"].(string), namespaceId)
+		if err != nil {
+			return err
+		}
+		input["item"] = newId
+	}
+
+	outputs := recipe["outputs"].([]interface{})
+	for outputIndex := range outputs {
+		output := outputs[outputIndex].(map[string]interface{})
+		delete(output, "_id")
+		newId, err := ConvertRcItemIDToItemServiceID(ctx, output["item"].(string), namespaceId)
+		if err != nil {
+			return err
+		}
+		output["item"] = newId
+	}
+
+	return nil
+}
+
+func (r *Resolver) RcRecipeImport(ctx context.Context) (string, error) {
+	err := permission.Check(ctx, "mutation.rcRecipeImport")
+	if err != nil {
+		return "No Permission", err
+	}
+
+	rcRecipeResponse, err := http.Get("https://rc.dukfaar.com/api/recipe")
+
+	if err != nil {
+		fmt.Printf("Error getting recipes: %v\n", err)
+		return "Error reading from RC", err
+	}
+	defer rcRecipeResponse.Body.Close()
+
+	var recipeData []interface{}
+	err = json.NewDecoder(rcRecipeResponse.Body).Decode(&recipeData)
+
+	if err != nil {
+		fmt.Printf("Error reading recipes: %v\n", err)
+		return "Error parsing data from RC", err
+	}
+
+	eventbus := ctx.Value("eventbus").(eventbus.EventBus)
+	namespaceId, err := fetchFFXIVNamespace(ctx)
+	if err != nil {
+		return "Error fetching namespace", err
+	}
+
+	go func() {
+		for index := range recipeData {
+			err := ConvertRecipe(ctx, recipeData[index].(map[string]interface{}), namespaceId)
+
+			if err == nil {
+				eventbus.Emit("import.recipe", recipeData[index])
+			}
+		}
+	}()
+
+	return "OK", nil
 }

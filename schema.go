@@ -30,6 +30,8 @@ var Schema string = `
 			createRecipe(input: RecipeMutationInput): Recipe!
 			updateRecipe(id: ID!, input: RecipeMutationInput): Recipe!
 			deleteRecipe(id: ID!): ID
+
+			rcRecipeImport(): String!
 		}` +
 	relay.PageInfoGraphQLString +
 	recipe.GraphQLType
