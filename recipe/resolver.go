@@ -19,6 +19,44 @@ func (r *Resolver) ID() *graphql.ID {
 	return &id
 }
 
+func (r *Resolver) NamespaceID() *graphql.ID {
+	if r.Model.NamespaceID == nil {
+		return nil
+	}
+
+	id := graphql.ID(r.Model.NamespaceID.Hex())
+	return &id
+}
+
+func (r *Resolver) CraftingJobID() *graphql.ID {
+	if r.Model.CraftingJobID == nil {
+		return nil
+	}
+
+	id := graphql.ID(r.Model.CraftingJobID.Hex())
+	return &id
+}
+
+func (r *Resolver) CraftingLevel() *int32 {
+	return r.Model.CraftingLevel
+}
+
+func (r *Resolver) Masterbook() *int32 {
+	return r.Model.Masterbook
+}
+
+func (r *Resolver) RequiredControl() *int32 {
+	return r.Model.RequiredControl
+}
+
+func (r *Resolver) RequiredCraftsmanship() *int32 {
+	return r.Model.RequiredCraftsmanship
+}
+
+func (r *Resolver) Stars() *int32 {
+	return r.Model.Stars
+}
+
 func (r *Resolver) Inputs() *[]*InputElementResolver {
 	l := make([]*InputElementResolver, len(r.Model.Inputs))
 	for i, input := range r.Model.Inputs {

@@ -20,9 +20,16 @@ type OutputElement struct {
 }
 
 type Model struct {
-	ID      bson.ObjectId   `json:"_id,omitempty" bson:"_id,omitempty"`
-	Inputs  []InputElement  `json:"inputs,omitempty"`
-	Outputs []OutputElement `json:"outputs,omitempty"`
+	ID                    bson.ObjectId   `json:"_id,omitempty" bson:"_id,omitempty"`
+	Inputs                []InputElement  `json:"inputs,omitempty"`
+	Outputs               []OutputElement `json:"outputs,omitempty"`
+	NamespaceID           *bson.ObjectId  `json:"namespaceId,omitempty" bson:"namespaceId,omitempty"`
+	CraftingLevel         *int32          `json:"craftingLevel,omitempty" bson:"craftingLevel,omitempty"`
+	CraftingJobID         *bson.ObjectId  `json:"craftingJob,omitempty" bson:"craftingJob,omitempty"`
+	Masterbook            *int32          `json:"masterbook,omitempty" bson:"masterbook,omitempty"`
+	RequiredControl       *int32          `json:"requiredControl,omitempty" bson:"requiredControl,omitempty"`
+	RequiredCraftsmanship *int32          `json:"requiredCraftsmanship,omitempty" bson:"requiredCraftsmanship,omitempty"`
+	Stars                 *int32          `json:"stars,omitempty" bson:"stars,omitempty"`
 }
 
 type MutationInOutElement struct {
@@ -38,8 +45,15 @@ type MutationInput struct {
 var GraphQLType = `
 type Recipe {
 	_id: ID
+	namespaceId: ID
 	inputs: [RecipeInput]
 	outputs: [RecipeOutput]
+	craftingLevel: Int
+	craftingJobId: ID
+	masterbook: Int
+	requiredControl: Int
+	requiredCraftsmanship: Int
+	stars: Int
 }
 
 type RecipeInput {
