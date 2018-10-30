@@ -144,6 +144,13 @@ func main() {
 		return nil
 	})
 
+	eventDBSession := dbSession.Clone()
+	eventDB := eventDBSession.DB("recipe")
+	defer eventDBSession.Close()
+	eventRecipeService := recipe.NewMgoService(eventDB, nsqEventbus)
+
+	nsqEventbus.On("import.recipe", "recipe", CreateRCEventImporter(eventRecipeService, loginApiGatewayFetcher))
+
 	http.Handle("/metrics", promhttp.Handler())
 
 	dukGraphql.EmitRegisterEvents("registerQuery", schema.Inspect().QueryType(), nsqEventbus)
