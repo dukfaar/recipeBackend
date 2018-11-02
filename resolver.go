@@ -19,23 +19,39 @@ import (
 type Resolver struct {
 }
 
+func AddInputOutputToQuery(query bson.M, inputId *string, outputId *string) {
+	if inputId != nil {
+		query["inputs"] = bson.ObjectIdHex(*inputId)
+	}
+	if outputId != nil {
+		query["outputs"] = bson.ObjectIdHex(*outputId)
+	}
+}
+
 func (r *Resolver) Recipes(ctx context.Context, args struct {
-	First  *int32
-	Last   *int32
-	Before *string
-	After  *string
+	First        *int32
+	Last         *int32
+	Before       *string
+	After        *string
+	InputItemId  *string
+	OutputItemId *string
 }) (*recipe.ConnectionResolver, error) {
 	recipeService := ctx.Value("recipeService").(recipe.Service)
 
 	var totalChannel = make(chan int)
 	go func() {
-		var total, _ = recipeService.Count()
+		countQuery := recipeService.MakeBaseQuery()
+		AddInputOutputToQuery(countQuery, args.InputItemId, args.OutputItemId)
+		var total, _ = recipeService.CountWithQuery(countQuery)
 		totalChannel <- total
 	}()
 
 	var recipesChannel = make(chan []recipe.Model)
 	go func() {
-		result, _ := recipeService.List(args.First, args.Last, args.Before, args.After)
+		listQuery := recipeService.MakeBaseQuery()
+		recipeService.MakeListQuery(listQuery, args.Before, args.After)
+		AddInputOutputToQuery(listQuery, args.InputItemId, args.OutputItemId)
+		result, _ := recipeService.PerformListQuery(listQuery, args.First, args.Last, args.Before, args.After)
 		recipesChannel <- result
 	}()
 
@@ -52,7 +68,9 @@ func (r *Resolver) Recipes(ctx context.Context, args struct {
 		start, end = recipes[0].ID.Hex(), recipes[len(recipes)-1].ID.Hex()
 	}
 
-	hasPreviousPageChannel, hasNextPageChannel := relay.GetHasPreviousAndNextPage(len(recipes), start, end, recipeService)
+	query := recipeService.MakeBaseQuery()
+	AddInputOutputToQuery(query, args.InputItemId, args.OutputItemId)
+	hasPreviousPageChannel, hasNextPageChannel := relay.GetHasPreviousAndNextPageWithQuery(query, len(recipes), start, end, recipeService)
 
 	return &recipe.ConnectionResolver{
 		Models: recipes,

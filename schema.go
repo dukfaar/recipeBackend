@@ -12,7 +12,7 @@ var Schema string = `
 		}
 
 		type Query {
-			recipes(first: Int, last: Int, before: String, after: String): RecipeConnection!
+			recipes(first: Int, last: Int, before: String, after: String, inputItemId: ID, outputItemId: ID): RecipeConnection!
 			recipe(id: ID!): Recipe!
 		}
 

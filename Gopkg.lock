@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1d7edd42d367893b9786dc94b60cc0688f28730611f6b559a730208751ab27e8"
+  digest = "1:7a940a09cd6f2e9f3f2ac7b58e36ede65872316f4ea52c9de327201edfa6b327"
   name = "github.com/dukfaar/goUtils"
   packages = [
     "env",
@@ -23,11 +23,11 @@
     "service",
   ]
   pruneopts = "UT"
-  revision = "8298546bdbc483106fed9246056198935f003964"
+  revision = "85ee7bd345077081877bf5a91e9aa7520e46ce15"
 
 [[projects]]
   branch = "master"
-  digest = "1:e0361634f0b5e1fd3227eaec90a86bc8595cb2526e71e41bcd72b6e474e198ca"
+  digest = "1:78102ee4d536347316bc42e818340cc50902e45dbd7fdd524c5a1fc0cb07b588"
   name = "github.com/globalsign/mgo"
   packages = [
     ".",
@@ -37,7 +37,7 @@
     "internal/scram",
   ]
   pruneopts = "UT"
-  revision = "1ca0a4f7cbcbe61c005d1bd43fdd8bb8b71df6bc"
+  revision = "eeefdecb41b842af6dc652aaea4026e8403e62df"
 
 [[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
@@ -65,7 +65,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:cbfdf9c2913efa9b6357c47f281e19e90425e454244cdb9d784331793f3315c1"
+  digest = "1:ff0333317e5ce03c571d19a3042a5a71d611b59e24eac37a4d1fb781aa7e79c3"
   name = "github.com/graph-gophers/graphql-go"
   packages = [
     ".",
@@ -84,7 +84,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "94da0f0031f9d30a1d56cd4b56e40852516c3301"
+  revision = "940d2b01f2549ee5d9e87141ea909134bf56e3a9"
 
 [[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
@@ -115,15 +115,16 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:d14a5f4bfecf017cb780bdde1b6483e5deb87e12c332544d2c430eda58734bcb"
+  digest = "1:20a8a18488bdef471795af0413d9a3c9c35dc24ca93342329b884ba3c15cbaab"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
+    "prometheus/internal",
     "prometheus/promhttp",
   ]
   pruneopts = "UT"
-  revision = "c5b7fccd204277076155f10851dad72b76a49317"
-  version = "v0.8.0"
+  revision = "1cafe34db7fdec6022e17e00e1c1ea501022f3e4"
+  version = "v0.9.0"
 
 [[projects]]
   branch = "master"
@@ -135,7 +136,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:63b68062b8968092eb86bedc4e68894bd096ea6b24920faca8b9dcf451f54bb5"
+  digest = "1:db712fde5d12d6cdbdf14b777f0c230f4ff5ab0be8e35b239fc319953ed577a4"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -143,11 +144,11 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
+  revision = "7e9e6cabbd393fc208072eedef99188d0ce788b6"
 
 [[projects]]
   branch = "master"
-  digest = "1:ef1dd9945e58ee9b635273d28c0ef3fa3742a7dedc038ebe207fd63e6ce000ef"
+  digest = "1:ef74914912f99c79434d9c09658274678bc85080ebe3ab32bec3940ebce5e1fc"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -156,7 +157,7 @@
     "xfs",
   ]
   pruneopts = "UT"
-  revision = "418d78d0b9a7b7de3a6bbc8a23def624cc977bb2"
+  revision = "185b4288413d2a0dd0806f78c90dde719829e5ae"
 
 [[projects]]
   branch = "master"
@@ -164,7 +165,7 @@
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = "UT"
-  revision = "2f5d2388922f370f4355f327fcf4cfe9f5583908"
+  revision = "b7e296877c6e5e01665044d943c8e6d10ce72a99"
 
 [solve-meta]
   analyzer-name = "dep"

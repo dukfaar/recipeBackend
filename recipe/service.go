@@ -19,6 +19,16 @@ type Service interface {
 	Count() (int, error)
 
 	List(first *int32, last *int32, before *string, after *string) ([]Model, error)
+
+	HasElementBeforeIDWithQuery(bson.M, string) (bool, error)
+	HasElementAfterIDWithQuery(bson.M, string) (bool, error)
+	CountWithQuery(bson.M) (int, error)
+
+	MakeBaseQuery() bson.M
+	MakeListQuery(query bson.M, before *string, after *string)
+
+	PerformQuery(query bson.M) *Model
+	PerformListQuery(query bson.M, first *int32, last *int32, before *string, after *string) ([]Model, error)
 }
 
 type MgoService struct {
@@ -45,6 +55,87 @@ func (s *MgoService) Create(model *Model) (*Model, error) {
 	}
 
 	return model, err
+}
+
+func (s *MgoService) MakeBaseQuery() bson.M {
+	return bson.M{}
+}
+
+func (s *MgoService) MakeListQuery(query bson.M, before *string, after *string) {
+	if after != nil {
+		query["_id"] = bson.M{
+			"$gt": bson.ObjectIdHex(*after),
+		}
+	}
+
+	if before != nil {
+		query["_id"] = bson.M{
+			"$lt": bson.ObjectIdHex(*before),
+		}
+	}
+}
+
+func (s *MgoService) PerformQuery(query bson.M) *Model {
+	var result Model
+	s.collection.Find(query).One(&result)
+	return &result
+}
+
+func (s *MgoService) PerformListQuery(query bson.M, first *int32, last *int32, before *string, after *string) ([]Model, error) {
+	var (
+		skip  int
+		limit int
+	)
+
+	if first != nil {
+		limit = int(*first)
+	}
+
+	if last != nil {
+		count, _ := s.collection.Find(query).Count()
+
+		limit = int(*last)
+		skip = count - limit
+	}
+
+	var result []Model
+	err := s.collection.Find(query).Skip(skip).Limit(limit).All(&result)
+	return result, err
+}
+
+func (s *MgoService) HasElementBeforeIDWithQuery(inquery bson.M, id string) (bool, error) {
+	query := bson.M{}
+
+	for k, v := range inquery {
+		query[k] = v
+	}
+
+	query["_id"] = bson.M{
+		"$lt": bson.ObjectIdHex(id),
+	}
+
+	count, err := s.collection.Find(query).Count()
+	return count > 0, err
+}
+
+func (s *MgoService) HasElementAfterIDWithQuery(inquery bson.M, id string) (bool, error) {
+	query := bson.M{}
+
+	for k, v := range inquery {
+		query[k] = v
+	}
+
+	query["_id"] = bson.M{
+		"$gt": bson.ObjectIdHex(id),
+	}
+
+	count, err := s.collection.Find(query).Count()
+	return count > 0, err
+}
+
+func (s *MgoService) CountWithQuery(query bson.M) (int, error) {
+	count, err := s.collection.Find(query).Count()
+	return count, err
 }
 
 func (s *MgoService) Update(id string, input interface{}) (*Model, error) {
