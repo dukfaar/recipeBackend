@@ -19,7 +19,7 @@
     "relay",
     "service"
   ]
-  revision = "24a335b693980d90851b2c2d7f2e8020a4d06e3f"
+  revision = "5928857c8de5f00f56d370093f1695c019e0fbce"
 
 [[projects]]
   branch = "master"

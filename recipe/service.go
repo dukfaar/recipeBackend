@@ -111,19 +111,8 @@ func (s *MgoService) FindByID(id string) (*Model, error) {
 }
 
 func (s *MgoService) List(first *int32, last *int32, before *string, after *string) ([]Model, error) {
-	query := bson.M{}
-
-	if after != nil {
-		query["_id"] = bson.M{
-			"$gt": bson.ObjectIdHex(*after),
-		}
-	}
-
-	if before != nil {
-		query["_id"] = bson.M{
-			"$lt": bson.ObjectIdHex(*before),
-		}
-	}
+	query := s.MakeBaseQuery()
+	s.MakeListQuery(query, before, after)
 
 	skip, limit := s.GetSkipLimit(query, first, last)
 
