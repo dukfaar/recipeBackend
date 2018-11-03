@@ -67,21 +67,7 @@ func (s *MgoService) PerformQuery(query bson.M) *Model {
 }
 
 func (s *MgoService) PerformListQuery(query bson.M, first *int32, last *int32, before *string, after *string) ([]Model, error) {
-	var (
-		skip  int
-		limit int
-	)
-
-	if first != nil {
-		limit = int(*first)
-	}
-
-	if last != nil {
-		count, _ := s.Collection.Find(query).Count()
-
-		limit = int(*last)
-		skip = count - limit
-	}
+	skip, limit := s.GetSkipLimit(query, first, last)
 
 	var result []Model
 	err := s.Collection.Find(query).Skip(skip).Limit(limit).All(&result)
@@ -139,21 +125,7 @@ func (s *MgoService) List(first *int32, last *int32, before *string, after *stri
 		}
 	}
 
-	var (
-		skip  int
-		limit int
-	)
-
-	if first != nil {
-		limit = int(*first)
-	}
-
-	if last != nil {
-		count, _ := s.Collection.Find(query).Count()
-
-		limit = int(*last)
-		skip = count - limit
-	}
+	skip, limit := s.GetSkipLimit(query, first, last)
 
 	var result []Model
 	err := s.Collection.Find(query).Skip(skip).Limit(limit).All(&result)
