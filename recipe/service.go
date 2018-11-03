@@ -114,9 +114,5 @@ func (s *MgoService) List(first *int32, last *int32, before *string, after *stri
 	query := s.MakeBaseQuery()
 	s.MakeListQuery(query, before, after)
 
-	skip, limit := s.GetSkipLimit(query, first, last)
-
-	var result []Model
-	err := s.Collection.Find(query).Skip(skip).Limit(limit).All(&result)
-	return result, err
+	return s.PerformListQuery(query, first, last, before, after)
 }
